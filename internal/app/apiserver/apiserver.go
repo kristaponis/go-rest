@@ -2,12 +2,14 @@ package apiserver
 
 // APIServer type
 type APIServer struct {
-	
+	config *Config
 }
 
 // New func
-func New() *APIServer {
-	return &APIServer{}
+func New(c *Config) *APIServer {
+	return &APIServer{
+		config: c,
+	}
 }
 
 // Start func
