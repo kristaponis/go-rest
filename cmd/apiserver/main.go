@@ -1,14 +1,32 @@
 package main
 
 import (
+	"flag"
 	"log"
 
+	"github.com/BurntSushi/toml"
 	"github.com/kristaponis/go-rest/internal/app/apiserver"
 )
 
+var (
+	configPath string
+)
+
+func init() {
+	flag.StringVar(&configPath, "config-path", "configs/apiserver.toml", "path to config file")
+}
+
 func main() {
-	s := apiserver.New()
-	err := s.Start()
+	flag.Parse()
+	
+	config := apiserver.NewConfig()
+	_, err := toml.DecodeFile(configPath, config)
+	if err != nil {
+		log.Fatal("TOML decoding went wrong: ", err)
+	}
+
+	s := apiserver.New(config)
+	err = s.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
