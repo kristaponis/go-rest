@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/kristaponis/go-rest/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,6 +14,7 @@ type APIServer struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
+	store  *store.Store
 }
 
 // New func
@@ -26,14 +28,28 @@ func New(c *Config) *APIServer {
 
 // Start func
 func (s *APIServer) Start() error {
-	err := s.loggerConf()
-	if err != nil {
+	if err := s.loggerConf(); err != nil {
 		return err
 	}
+
 	s.routerConf()
 	s.logger.Info("Starting api server..")
 
-	return http.ListenAndServe(s.config.BindAddr, s.router) 
+	if err := s.storeConf(); err != nil {
+		return err
+	}
+
+	return http.ListenAndServe(s.config.BindAddr, s.router)
+}
+
+// storeConf function
+func (s APIServer) storeConf() error {
+	st := store.New(s.config.Store)
+	if err := st.Open(); err != nil {
+		return err
+	}
+	s.store = st
+	return nil
 }
 
 // loggerConf sets parses log level and returns err if something goes wrong
