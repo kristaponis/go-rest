@@ -9,8 +9,9 @@ import (
 
 // Store type
 type Store struct {
-	config *Config
-	db     *sql.DB
+	config   *Config
+	db       *sql.DB
+	userRepo *UserRepository
 }
 
 // New function initializes new Store object
@@ -36,4 +37,15 @@ func (s *Store) Open() error {
 // Close function
 func (s *Store) Close() {
 	s.db.Close()
+}
+
+// User function
+func (s *Store) User() *UserRepository {
+	if s.userRepo != nil {
+		return s.userRepo
+	}
+	s.userRepo = &UserRepository{
+		store: s,
+	}
+	return s.userRepo
 }
