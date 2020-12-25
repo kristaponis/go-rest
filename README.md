@@ -2,4 +2,5 @@
 
 REST api written in Golang
 
-Simple REST api
+Simple REST api:
+- Migrations made with [golang-migrate](https://github.com/golang-migrate/migrate)
