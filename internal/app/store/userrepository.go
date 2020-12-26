@@ -9,10 +9,19 @@ type UserRepository struct {
 
 // Create function
 func (ur *UserRepository) Create(u *models.User) (*models.User, error) {
+	if err := u.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := u.BeforeCreate(); err != nil {
+		return nil, err
+	}
+
 	if err := ur.store.db.QueryRow(
 		"INSERT INTO users (id, email, enc_password) VALUES ($1, $2, $3) RETURNING id", u.ID, u.Email, u.EncPassword).Scan(&u.ID); err != nil {
 		return nil, err
 	}
+
 	return u, nil
 }
 
